@@ -27,6 +27,15 @@ MapControls.register('zoom', function(opts) {
         control.set('value', newVal);
     } // _changeVal
     
+    function preventDblClick(evt) {
+        if (typeof evt.cancelBubble != 'undefined') {
+            evt.cancelBubble = true;
+        }
+        else {
+            evt.preventDefault();
+        }
+    }
+    
     function genClasses() {
         var output = [];
         for (var ii = 0; ii < arguments.length; ii++) {
@@ -59,7 +68,7 @@ MapControls.register('zoom', function(opts) {
         thumb, control, thumbStart = 0, sliderHeight;
         
     // add a thumb to the slider
-    slider.appendChild(thumb = MapControls._createEl('a', {
+    slider.appendChild(thumb = MapControls._createEl('div', {
         className: genClasses('thumb')
     }));
     
@@ -70,6 +79,15 @@ MapControls.register('zoom', function(opts) {
 
     // add the slider
     zoombar.appendChild(slider);
+    
+    if (typeof window.attachEvent != 'undefined') {
+        zoombar.attachEvent('dblclick', preventDblClick);
+        // ie event is called ondblclick...why?
+        zoombar.attachEvent('ondblclick', preventDblClick);
+    }
+    else {
+        zoombar.addEventListener('dblclick', preventDblClick, false);
+    }
     
     // add the zoom in button
     zoombar.appendChild(MapControls._createEl('a', {
